@@ -23,7 +23,7 @@ from typing import Dict, Optional
 # ============================================================
 
 # M4 Mission Control endpoint
-M4_IP = "192.168.1.100"  # UPDATE: Your M4's local IP
+M4_IP = "127.0.0.1"  # Via Pi Firewall tunnel to M4
 M4_PORT = 9999
 
 # MT5 Common Files path (M1)
