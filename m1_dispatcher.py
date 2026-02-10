@@ -11,7 +11,7 @@ UDP_PORT = 49211
 
 # REPLACE THIS with your M4 Dashboard's Tailscale IP (e.g., "100.x.y.z")
 # If Tailscale isn't active yet, keep as "127.0.0.1" for SSH Tunneling.
-DEST_IP = "127.0.0.1"
+DEST_IP = "100.89.219.16"
 
 # --- PATHS ---
 # Common folder where Nova writes JSON status files
