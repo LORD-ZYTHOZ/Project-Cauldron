@@ -81,27 +81,34 @@ def get_telemetry():
     nodes = {}
     now = time.time()
     try:
-        for file in os.listdir(MT5_COMMON_PATH):
-            if file.endswith("_status.json"):
-                filepath = os.path.join(MT5_COMMON_PATH, file)
-                mtime = os.path.getmtime(filepath)
-                latency_ms = (now - mtime) * 1000
-
-                with open(filepath, "r") as f:
-                    data = json.load(f)
-
-                # Use the bot name from JSON, or derive from filename
-                bot_name = data.get("bot", file.replace("_status.json", ""))
-                node_key = bot_name.lower().replace(" ", "_")
-                data["latency_ms"] = round(latency_ms, 1)
-                data.setdefault("status", "RUNNING")
-                data.setdefault("last_action", "—")
-                data.setdefault("current_pnl", 0)
-                data.setdefault("latency_jitter", 0)
-                nodes[node_key] = data
-        return nodes
-    except Exception as e:
+        files = os.listdir(MT5_COMMON_PATH)
+    except OSError:
         return {}
+
+    for file in files:
+        if not file.endswith("_status.json"):
+            continue
+        try:
+            filepath = os.path.join(MT5_COMMON_PATH, file)
+            mtime = os.path.getmtime(filepath)
+            latency_ms = (now - mtime) * 1000
+
+            with open(filepath, "r") as f:
+                data = json.load(f)
+
+            # Use the bot name from JSON, or derive from filename
+            bot_name = data.get("bot", file.replace("_status.json", ""))
+            node_key = bot_name.lower().replace(" ", "_")
+            data["latency_ms"] = round(latency_ms, 1)
+            data.setdefault("status", "RUNNING")
+            data.setdefault("last_action", "—")
+            data.setdefault("current_pnl", 0)
+            data.setdefault("latency_jitter", 0)
+            nodes[node_key] = data
+        except (json.JSONDecodeError, OSError):
+            # File being written to by Nova — skip this cycle, keep other nodes
+            continue
+    return nodes
 
 
 def build_packet(nodes, start_time, strike_log):
