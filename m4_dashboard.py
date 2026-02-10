@@ -28,7 +28,7 @@ from rich.text import Text
 # CONFIG
 # ============================================================
 
-LISTEN_PORT = 9999
+LISTEN_PORT = 49211
 WAR_CHEST_GOAL = 100_000.0
 
 # Cyberpunk color scheme
