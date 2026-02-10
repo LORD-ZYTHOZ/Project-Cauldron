@@ -14,9 +14,10 @@ UDP_PORT = 49211
 DEST_IP = "100.89.219.16"
 
 # --- PATHS ---
-# Common folder where Nova writes JSON status files
+# Wine MT5 Common Files (actual location on M1)
 MT5_COMMON_PATH = os.path.expanduser(
-    "~/Library/Application Support/MetaTrader 5/Terminal/Common/Files"
+    "~/Library/Application Support/net.metaquotes.wine.metatrader5"
+    "/drive_c/users/user/AppData/Roaming/MetaQuotes/Terminal/Common/Files"
 )
 
 # War Chest goal
@@ -81,7 +82,7 @@ def get_telemetry():
     now = time.time()
     try:
         for file in os.listdir(MT5_COMMON_PATH):
-            if file.startswith("nova_status_") and file.endswith(".json"):
+            if file.endswith("_status.json"):
                 filepath = os.path.join(MT5_COMMON_PATH, file)
                 mtime = os.path.getmtime(filepath)
                 latency_ms = (now - mtime) * 1000
@@ -89,13 +90,15 @@ def get_telemetry():
                 with open(filepath, "r") as f:
                     data = json.load(f)
 
-                node_id = file.split("_")[2].split(".")[0]
+                # Use the bot name from JSON, or derive from filename
+                bot_name = data.get("bot", file.replace("_status.json", ""))
+                node_key = bot_name.lower().replace(" ", "_")
                 data["latency_ms"] = round(latency_ms, 1)
                 data.setdefault("status", "RUNNING")
                 data.setdefault("last_action", "—")
                 data.setdefault("current_pnl", 0)
                 data.setdefault("latency_jitter", 0)
-                nodes[f"node_{node_id}"] = data
+                nodes[node_key] = data
         return nodes
     except Exception as e:
         return {}
